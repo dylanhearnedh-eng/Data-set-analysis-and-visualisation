@@ -1,0 +1,42 @@
+#data set analysis done in google colab with python, each gap is a different block of code
+
+import pandas as pd
+df = pd.read_csv('/content/spending_patterns_detailed.csv')
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+
+df.isnull().sum()
+#no null values found
+
+df.describe()
+
+df.info()
+
+data = df['Total Spent']
+Q1 = np.percentile(data,25)
+Q3 = np.percentile(data,75)
+range = Q3 - Q1
+lower_bound = np.percentile(data,25)
+upper_bound = np.percentile(data,75)
+filtered_data = data[(data >= lower_bound) & (data <= upper_bound)]
+
+#Interquartile range is being used here
+plt.hist(filtered_data, bins=8, color='skyblue', edgecolor='black')
+plt.xlabel("Total Amount Spent")
+plt.ylabel("Frequency")
+plt.title("Total Spend Within The Inter_Quartile Range")
+plt.show()
+
+sns.countplot(df, y ='Payment Method', hue = 'Location', dodge = True, legend = 'full')
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+
+testdf = df.groupby('Payment Method')[['Price Per Unit','Total Spent']].sum()
+corrs = testdf.corr()
+corrs
+
+plt.subplots(figsize=(15,10))
+map1=sns.heatmap(testdf, annot=True, linewidth=5, fmt = ".1f")
+map1
+
+sns.boxenplot(df, x = filtered_data, y = 'Location', scale = 'area')
